@@ -151,7 +151,7 @@ class XPlaneConnect(object):
           ac: The aircraft to set the control surfaces of. 0 is the main/player aircraft.
         '''
         # Send request
-        buffer = struct.pack("<4sxB", "GETP", ac)
+        buffer = struct.pack("<4sxB", b"GETP", ac)
         self.sendUDP(buffer)
 
         # Read response
@@ -160,7 +160,7 @@ class XPlaneConnect(object):
             raise ValueError("Unexpected response length.")
 
         result = struct.unpack("<4sxBfffffff", resultBuf)
-        if result[0] != "POSI":
+        if result[0] != b"POSI":
             raise ValueError("Unexpected header: " + result[0])
 
         # Drop the header & ac from the return value
@@ -190,7 +190,7 @@ class XPlaneConnect(object):
             raise ValueError("Aircraft number must be between 0 and 20.")
 
         # Pack message
-        buffer = struct.pack("<4sxB", "POSI", ac)
+        buffer = struct.pack("<4sxB", b"POSI", ac)
         for i in range(7):
             val = -998
             if i < len(values):
@@ -208,7 +208,7 @@ class XPlaneConnect(object):
           ac: The aircraft to set the control surfaces of. 0 is the main/player aircraft.
         '''
         # Send request
-        buffer = struct.pack("<4sxB", "GETC", ac)
+        buffer = struct.pack("<4sxB", b"GETC", ac)
         self.sendUDP(buffer)
 
         # Read response
@@ -217,7 +217,7 @@ class XPlaneConnect(object):
             raise ValueError("Unexpected response length.")
 
         result = struct.unpack("<4sxffffbfBf", resultBuf)
-        if result[0] != "CTRL":
+        if result[0] != b"CTRL":
             raise ValueError("Unexpected header: " + result[0])
 
         # Drop the header from the return value
@@ -248,7 +248,7 @@ class XPlaneConnect(object):
             raise ValueError("Aircraft number must be between 0 and 20.")
 
         # Pack message
-        buffer = struct.pack("<4sx", "CTRL")
+        buffer = struct.pack("<4sx", b"CTRL")
         for i in range(6):
             val = -998
             if i < len(values):
@@ -285,9 +285,9 @@ class XPlaneConnect(object):
         if len(drefs) != len(values):
             raise ValueError("drefs and values must have the same number of elements.")
 
-        buffer = struct.pack("<4sx", "DREF")
+        buffer = struct.pack("<4sx", b"DREF")
         for i in range(len(drefs)):
-            dref = drefs[i]
+            dref = drefs[i].encode('utf-8')
             value = values[i]
             # Preconditions
             if len(dref) == 0 or len(dref) > 255:
@@ -328,10 +328,10 @@ class XPlaneConnect(object):
              datarefs.
         '''
         # Send request
-        buffer = struct.pack("<4sxB", "GETD", len(drefs))
+        buffer = struct.pack("<4sxB", b"GETD", len(drefs))
         for dref in drefs:
             fmt = "<B{0:d}s".format(len(dref))
-            buffer += struct.pack(fmt, len(dref), dref)
+            buffer += struct.pack(fmt, len(dref), dref.encode('utf-8'))
         self.sendUDP(buffer)
 
         # Read and parse response
