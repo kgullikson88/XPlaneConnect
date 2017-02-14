@@ -368,7 +368,7 @@ class XPlaneConnect(object):
             msg = ""
 
         msgLen = len(msg)
-        buffer = struct.pack("<4sxiiB" + str(msgLen) + "s", "TEXT", x, y, msgLen, msg)
+        buffer = struct.pack("<4sxiiB" + str(msgLen) + "s", b"TEXT", x, y, msgLen, msg.encode('utf-8'))
         self.sendUDP(buffer)
 
     def sendVIEW(self, view):
